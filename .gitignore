@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+
+# Secrets. Commit the .env.example files instead.
+.env
+.env.local
+.env.*.local
+server/.env
+client/.env
+
+.vercel/
+.vite/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

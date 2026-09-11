@@ -1,0 +1,639 @@
+/* =========================================================
+   LOGIN
+   Left: brand hero with the live tower grid.
+   Right: the OTP form.
+   ========================================================= */
+
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.72fr) minmax(420px, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--surface);
+}
+
+/* ---------------------------------------------------------
+   HERO
+   --------------------------------------------------------- */
+
+.login-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 34px 46px 28px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 78% 12%, rgba(255, 255, 255, 0.14), transparent 42%),
+    linear-gradient(158deg, #1d5ad9 0%, #2668e4 46%, #2f74ef 100%);
+}
+
+/* The faint blueprint grid behind the content. */
+.login-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 46px 46px;
+  pointer-events: none;
+}
+
+.login-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.17);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #fff;
+}
+
+.brand-name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.brand-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 2.1px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+/* ---- Headline block ------------------------------------------- */
+
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 48px;
+  margin-top: 52px;
+}
+
+.hero-copy {
+  max-width: 470px;
+}
+
+.hero-title {
+  font-size: clamp(30px, 3.1vw, 43px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.06;
+}
+
+/* "Deals." fades out, as in the reference design. */
+.hero-title em {
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.hero-sub {
+  margin-top: 16px;
+  max-width: 400px;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-metrics {
+  display: flex;
+  gap: 44px;
+  padding-top: 4px;
+}
+
+.hero-metric strong {
+  display: block;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.hero-metric span {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.hero-trusted {
+  margin-top: 26px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---- Tower grid ------------------------------------------------ */
+
+.towers {
+  --cell: 12px;
+  --cell-gap: 3px;
+
+  position: relative;
+  display: flex;
+  /* Towers of different heights share one ground line, as a real skyline
+     would. The tallest sets the height of the block. */
+  align-items: flex-end;
+  gap: 34px;
+  margin-top: auto;
+  padding-bottom: 4px;
+}
+
+/* Short viewports shrink the flats rather than clipping the buildings. */
+@media (max-height: 900px) {
+  .towers {
+    --cell: 10px;
+    gap: 28px;
+  }
+}
+
+@media (max-height: 800px) {
+  .towers {
+    --cell: 8px;
+    --cell-gap: 2px;
+    gap: 24px;
+  }
+}
+
+@media (max-height: 700px) {
+  .towers {
+    --cell: 6px;
+    --cell-gap: 2px;
+    gap: 20px;
+  }
+}
+
+.tower {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tower-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 1.9px;
+  color: rgba(255, 255, 255, 0.52);
+  white-space: nowrap;
+}
+
+/* Each tower is a column of flats. Its width comes from the column count
+   and its height from the floor count, both set per tower in the markup. */
+.tower-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  gap: var(--cell-gap);
+  padding: calc(var(--cell-gap) * 2.6);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.tower-cell {
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 1.5px;
+  /* The resting state: a lit but unremarkable flat. */
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.tower-cell.is-available { background: var(--unit-available); }
+.tower-cell.is-hold      { background: var(--unit-hold); }
+.tower-cell.is-reserved  { background: var(--unit-reserved); }
+.tower-cell.is-booked    { background: var(--unit-booked); }
+.tower-cell.is-sold      { background: rgba(255, 255, 255, 0.34); }
+
+.tower-legend {
+  position: absolute;
+  right: 4px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.tower-legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.3px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+.tower-legend i {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+/* ---- Compliance strip ------------------------------------------ */
+
+.hero-compliance {
+  display: flex;
+  gap: 26px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.hero-compliance li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.hero-compliance svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.82;
+}
+
+/* ---------------------------------------------------------
+   FORM PANE
+   --------------------------------------------------------- */
+
+.login-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 56px;
+  background: var(--surface);
+}
+
+.login-form {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.login-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 2.2px;
+  color: var(--brand-600);
+}
+
+.login-heading {
+  margin-top: 12px;
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: -1.1px;
+  color: var(--text-strong);
+}
+
+.login-intro {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.field {
+  margin-top: 30px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.phone-input {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 16px;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.phone-input:focus-within {
+  border-color: var(--brand-500);
+  background: var(--surface);
+  box-shadow: var(--ring);
+}
+
+.phone-input .prefix {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.phone-input input,
+.otp-input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 1.4px;
+  color: var(--text-strong);
+}
+
+.phone-input input::placeholder {
+  color: var(--text-subtle);
+  letter-spacing: 1.4px;
+}
+
+.otp-input {
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
+  font-size: 22px;
+  letter-spacing: 11px;
+  text-align: center;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.otp-input:focus {
+  border-color: var(--brand-500);
+  background: var(--surface);
+  box-shadow: var(--ring);
+}
+
+.login-submit {
+  width: 100%;
+  height: 50px;
+  margin-top: 22px;
+  border-radius: var(--r-md);
+  background: var(--brand-600);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  transition: background 140ms ease, transform 90ms ease;
+}
+
+.login-submit:hover:not(:disabled) {
+  background: var(--brand-700);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Before a valid number is typed the button reads as inert. */
+.login-submit:disabled {
+  background: var(--neutral-bg);
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+.login-back {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.login-back:hover {
+  color: var(--brand-600);
+}
+
+.login-resend {
+  margin-top: 18px;
+  font-size: 12.5px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.login-resend button {
+  font-weight: 600;
+  color: var(--brand-600);
+}
+
+.login-hint {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 11px 13px;
+  border: 1px solid var(--info-border);
+  border-radius: var(--r-sm);
+  background: var(--info-bg);
+  font-size: 12.5px;
+  color: var(--info);
+}
+
+.login-hint code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 11px 13px;
+  border: 1px solid var(--danger-border);
+  border-radius: var(--r-sm);
+  background: var(--danger-bg);
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+/* ---- Footer ---------------------------------------------------- */
+
+.login-footer {
+  width: 100%;
+  max-width: 380px;
+  margin: 44px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.login-secure {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.login-badges {
+  display: flex;
+  gap: 22px;
+  margin-top: 14px;
+}
+
+.login-badges li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--text-subtle);
+}
+
+.login-secure svg,
+.login-badges svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+/* Narrow desktops: the metrics move under the headline so neither
+   column has to squeeze. */
+@media (max-width: 1280px) {
+  .login {
+    grid-template-columns: minmax(0, 1.35fr) minmax(380px, 1fr);
+  }
+
+  .login-hero {
+    padding: 30px 36px 26px;
+  }
+
+  .hero-top {
+    flex-direction: column;
+    gap: 26px;
+    margin-top: 36px;
+  }
+
+  .login-pane {
+    padding: 44px 40px;
+  }
+}
+
+/* Tablet and phone: one column. The hero becomes a banner above the
+   form, and the skyline is dropped rather than shrunk to noise. */
+@media (max-width: 1024px) {
+  .login {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .login-hero {
+    padding: 26px 24px 30px;
+  }
+
+  .hero-top {
+    margin-top: 28px;
+    gap: 22px;
+  }
+
+  .hero-title {
+    font-size: clamp(27px, 6vw, 36px);
+  }
+
+  .hero-sub {
+    max-width: none;
+  }
+
+  .towers,
+  .hero-compliance {
+    display: none;
+  }
+
+  .login-pane {
+    justify-content: flex-start;
+    padding: 38px 24px 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-hero {
+    padding: 20px 18px 26px;
+  }
+
+  .hero-metrics {
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  .hero-metric strong {
+    font-size: 23px;
+  }
+
+  .hero-metric span {
+    font-size: 11.5px;
+  }
+
+  .hero-trusted {
+    margin-top: 20px;
+    font-size: 11.5px;
+  }
+
+  .login-pane {
+    padding: 30px 18px 36px;
+  }
+
+  .login-heading {
+    font-size: 27px;
+  }
+
+  /* 16px keeps iOS Safari from zooming the page on focus. */
+  .phone-input input,
+  .otp-input {
+    font-size: 16px;
+  }
+
+  .otp-input {
+    letter-spacing: 8px;
+    font-size: 19px;
+  }
+
+  .login-footer {
+    margin-top: 32px;
+  }
+
+  .login-badges {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
+/* Landscape phones have almost no height to spare. */
+@media (max-height: 560px) and (max-width: 1024px) {
+  .login-hero {
+    padding: 16px 18px 20px;
+  }
+
+  .hero-top {
+    margin-top: 18px;
+  }
+
+  .hero-sub,
+  .hero-trusted {
+    display: none;
+  }
+}

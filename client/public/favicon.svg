@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f74ef" />
+      <stop offset="1" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="15" fill="url(#g)" />
+
+  <!-- Three towers, echoing the inventory board on the sign-in screen. -->
+  <rect x="14" y="32" width="10" height="20" rx="1.6" fill="#fff" opacity=".55" />
+  <rect x="27" y="18" width="10" height="34" rx="1.6" fill="#fff" opacity=".92" />
+  <rect x="40" y="26" width="10" height="26" rx="1.6" fill="#fff" opacity=".7" />
+
+  <!-- A few lit units. -->
+  <rect x="29.5" y="22" width="2.4" height="2.4" rx=".5" fill="#1d4ed8" />
+  <rect x="33.2" y="22" width="2.4" height="2.4" rx=".5" fill="#1d4ed8" />
+  <rect x="29.5" y="27" width="2.4" height="2.4" rx=".5" fill="#1d4ed8" />
+  <rect x="33.2" y="31" width="2.4" height="2.4" rx=".5" fill="#1d4ed8" />
+</svg>

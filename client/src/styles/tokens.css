@@ -1,0 +1,216 @@
+/* =========================================================
+   DESIGN TOKENS
+   Every colour, radius, shadow and type step in the product is
+   declared once here. Dark mode redefines the same names, so no
+   component ever needs a theme-specific rule.
+   ========================================================= */
+
+:root {
+  /* ---- Brand ---------------------------------------------------- */
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-800: #1e40af;
+  --brand-900: #1e3a8a;
+
+  /* ---- Surfaces ------------------------------------------------- */
+  --canvas: #f4f7fb;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f8fafc;
+  --surface-hover: #f1f5f9;
+
+  /* ---- Text ----------------------------------------------------- */
+  --text: #0f1e35;
+  --text-strong: #020617;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* ---- Lines ---------------------------------------------------- */
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-subtle: #eef2f7;
+
+  /* ---- Status --------------------------------------------------- */
+  --success: #059669;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+
+  --info: #0369a1;
+  --info-bg: #f0f9ff;
+  --info-border: #bae6fd;
+
+  --neutral-bg: #f1f5f9;
+  --neutral-border: #e2e8f0;
+
+  /* ---- Unit states, matched to the tower legend ------------------ */
+  --unit-available: #4ade80;
+  --unit-hold: #fbbf24;
+  --unit-reserved: #c084fc;
+  --unit-booked: #fb7185;
+  --unit-sold: #cbd5e1;
+
+  /* Soft fills for the status pills and chips. */
+  --unit-available-bg: #ecfdf5;
+  --unit-available-fg: #047857;
+  --unit-hold-bg: #fffbeb;
+  --unit-hold-fg: #b45309;
+  --unit-reserved-bg: #f5f3ff;
+  --unit-reserved-fg: #7c3aed;
+  --unit-booked-bg: #fff1f2;
+  --unit-booked-fg: #be123c;
+  --unit-sold-bg: #f1f5f9;
+  --unit-sold-fg: #475569;
+
+  /* ---- Lead score bands ----------------------------------------- */
+  --score-hot: #059669;
+  --score-hot-bg: #ecfdf5;
+  --score-warm: #b45309;
+  --score-warm-bg: #fffbeb;
+  --score-cold: #475569;
+  --score-cold-bg: #f1f5f9;
+
+  /* ---- Chart series --------------------------------------------- */
+  --chart-1: #2563eb;
+  --chart-2: #10b981;
+  --chart-3: #f59e0b;
+  --chart-4: #8b5cf6;
+  --chart-5: #ec4899;
+  --chart-6: #06b6d4;
+  --chart-grid: #e8eef6;
+  --chart-axis: #94a3b8;
+
+  /* ---- Sidebar (always the brand gradient, both themes) ---------- */
+  --nav-from: #1e56d6;
+  --nav-to: #2f74ef;
+  --nav-text: rgba(255, 255, 255, 0.86);
+  --nav-text-active: #ffffff;
+  --nav-active-bg: rgba(255, 255, 255, 0.16);
+  --nav-hover-bg: rgba(255, 255, 255, 0.09);
+  --nav-section: rgba(255, 255, 255, 0.5);
+
+  /* ---- Elevation ------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(15, 30, 53, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 30, 53, 0.07), 0 1px 2px rgba(15, 30, 53, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 30, 53, 0.08);
+  --shadow-lg: 0 18px 44px rgba(15, 30, 53, 0.14);
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.18);
+
+  /* ---- Radii ----------------------------------------------------- */
+  --r-xs: 5px;
+  --r-sm: 7px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --r-pill: 999px;
+
+  /* ---- Type ------------------------------------------------------ */
+  --font-sans: "Archivo", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  /* Figures, codes and labels are set in mono so columns line up. */
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular,
+    "SF Mono", Menlo, Consolas, monospace;
+
+  --t-xs: 11px;
+  --t-sm: 12px;
+  --t-base: 13px;
+  --t-md: 14px;
+  --t-lg: 16px;
+  --t-xl: 20px;
+  --t-2xl: 26px;
+  --t-3xl: 34px;
+
+  /* ---- Layout ---------------------------------------------------- */
+  --sidebar-w: 258px;
+  --sidebar-w-collapsed: 68px;
+  --topbar-h: 62px;
+  --content-pad: 26px;
+}
+
+/* =========================================================
+   DARK THEME
+   Only the token values change; no component rules are repeated.
+   ========================================================= */
+
+:root[data-theme="dark"] {
+  --canvas: #0b1220;
+  --surface: #111a2e;
+  --surface-raised: #16213a;
+  --surface-sunken: #0d1526;
+  --surface-hover: #1b2740;
+
+  --text: #e7eefc;
+  --text-strong: #ffffff;
+  --text-muted: #93a4c1;
+  --text-subtle: #6b7d9c;
+  --text-inverse: #0b1220;
+
+  --border: #223150;
+  --border-strong: #2f4166;
+  --border-subtle: #1a2740;
+
+  --success: #34d399;
+  --success-bg: #06281f;
+  --success-border: #10503f;
+
+  --warning: #fbbf24;
+  --warning-bg: #2a1f05;
+  --warning-border: #6b4c0c;
+
+  --danger: #f87171;
+  --danger-bg: #2c1113;
+  --danger-border: #6b2427;
+
+  --info: #38bdf8;
+  --info-bg: #06202e;
+  --info-border: #0d465f;
+
+  --neutral-bg: #1a2740;
+  --neutral-border: #223150;
+
+  --score-hot: #34d399;
+  --score-hot-bg: #06281f;
+  --score-warm: #fbbf24;
+  --score-warm-bg: #2a1f05;
+  --score-cold: #93a4c1;
+  --score-cold-bg: #1a2740;
+
+  --unit-sold: #475569;
+
+  --unit-available-bg: #06281f;
+  --unit-available-fg: #34d399;
+  --unit-hold-bg: #2a1f05;
+  --unit-hold-fg: #fbbf24;
+  --unit-reserved-bg: #211a3a;
+  --unit-reserved-fg: #c4b5fd;
+  --unit-booked-bg: #2c1113;
+  --unit-booked-fg: #fda4af;
+  --unit-sold-bg: #1a2740;
+  --unit-sold-fg: #93a4c1;
+
+  --chart-grid: #1e2c47;
+  --chart-axis: #6b7d9c;
+
+  --nav-from: #14213d;
+  --nav-to: #1b3a6b;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.6);
+  --ring: 0 0 0 3px rgba(56, 130, 246, 0.3);
+}

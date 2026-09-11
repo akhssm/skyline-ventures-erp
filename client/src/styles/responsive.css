@@ -1,0 +1,453 @@
+/* =========================================================
+   RESPONSIVE
+   Loaded last, so it is the single place that describes how the
+   app reflows. Breakpoints, widest first:
+
+     1500  five KPI tiles no longer fit
+     1280  the dashboard's chart and side panel stop sitting together
+     1024  the sidebar becomes a drawer (in layout.css)
+      860  page headers and toolbars stack
+      640  one column everywhere, overlays go full screen
+      420  smallest phones
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   <= 1500  Five across is too tight
+   --------------------------------------------------------- */
+
+@media (max-width: 1500px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------------------------------------------------------
+   <= 1280  Side-by-side panels unstack
+   --------------------------------------------------------- */
+
+@media (max-width: 1280px) {
+  .dashboard-split,
+  .contact-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The support panel reads better above the form once it is full width. */
+  .contact-layout > aside {
+    order: -1;
+  }
+}
+
+/* ---------------------------------------------------------
+   <= 1024  Tablet
+   The sidebar becomes a drawer here; see layout.css.
+   --------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  :root {
+    --content-pad: 18px;
+    --t-2xl: 23px;
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kpi {
+    min-height: 172px;
+  }
+
+  .chart-frame {
+    height: 260px;
+  }
+}
+
+/* ---------------------------------------------------------
+   <= 860  Toolbars stack
+   Filter rows stop being a single line of controls and become a
+   wrapped block, with each control wide enough to tap.
+   --------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .bf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .page-actions {
+    justify-content: flex-start;
+  }
+
+  .filters {
+    gap: 8px;
+  }
+
+  .search {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* A "/" hint is meaningless without a keyboard. */
+  .search kbd {
+    display: none;
+  }
+
+  .filters .select {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .chips,
+  .segmented {
+    flex: 1 1 100%;
+  }
+
+  .chips button,
+  .segmented button {
+    flex: 1;
+  }
+
+  /* Tabs scroll sideways rather than wrapping into a tall block. */
+  .booking-tabs {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .booking-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .booking-tab {
+    flex-shrink: 0;
+  }
+
+  .pill-filter {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+  }
+
+  .stat-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detail-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------
+   <= 640  Phone
+   --------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .bf {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bf-import-meta {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  :root {
+    --content-pad: 14px;
+    --topbar-h: 56px;
+    --t-2xl: 21px;
+  }
+
+  .kpi-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .kpi {
+    min-height: 0;
+  }
+
+  .form-grid,
+  .config-grid,
+  .integration-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filters .select,
+  .pill-filter {
+    flex: 1 1 100%;
+  }
+
+  /* Buttons in a page header fill the row so they are easy to hit. */
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .chart-frame {
+    height: 230px;
+  }
+
+  /* Tables keep their columns and scroll sideways. Collapsing them into
+     cards would lose the alignment that makes the figures comparable. */
+  .table thead th,
+  .table tbody td {
+    padding: 10px 11px;
+  }
+
+  .table {
+    font-size: 12.5px;
+  }
+
+  .card {
+    border-radius: var(--r-md);
+  }
+
+  .card-pad,
+  .card-head {
+    padding: 14px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+  }
+
+  /* Overlays take the whole screen; a floating panel on a phone just
+     wastes the edges. */
+  .overlay.is-centered {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    animation: sheet-up 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .drawer {
+    max-width: 100%;
+  }
+
+  .unit-peek {
+    max-width: 100%;
+  }
+
+  .modal-head,
+  .drawer-head,
+  .modal-body,
+  .drawer-body,
+  .modal-foot,
+  .drawer-foot {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .modal-foot,
+  .drawer-foot {
+    gap: 8px;
+  }
+
+  .modal-foot .btn,
+  .drawer-foot .btn {
+    flex: 1;
+  }
+
+  .toasts {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+
+  .notif-panel {
+    position: fixed;
+    top: var(--topbar-h);
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+  }
+
+  .profile-menu {
+    right: 0;
+    min-width: 208px;
+  }
+
+  .mix-row {
+    grid-template-columns: 74px minmax(0, 1fr) 54px;
+    gap: 9px;
+  }
+
+  .status-strip {
+    gap: 6px;
+  }
+
+  .status-chip {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 11.5px;
+  }
+
+  .state {
+    padding: 44px 16px;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ---------------------------------------------------------
+   <= 420  Smallest phones
+   --------------------------------------------------------- */
+
+@media (max-width: 420px) {
+  :root {
+    --content-pad: 12px;
+  }
+
+  .stat-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tenant-chip {
+    max-width: 130px;
+    padding: 6px 11px;
+    font-size: 12px;
+  }
+
+  .topbar {
+    gap: 6px;
+  }
+
+  .page-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------
+   Coarse pointers
+   Touch targets need to be reachable with a fingertip, and hover
+   styling that sticks after a tap is worse than none.
+   --------------------------------------------------------- */
+
+@media (pointer: coarse) {
+  .row-action,
+  .icon-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .btn {
+    height: 40px;
+  }
+
+  .btn-sm {
+    height: 34px;
+  }
+
+  .input,
+  .select,
+  .search input {
+    height: 42px;
+    /* Anything under 16px makes iOS Safari zoom the page on focus. */
+    font-size: 16px;
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+  }
+
+  .table tbody tr:hover {
+    background: transparent;
+  }
+}
+
+/* ---------------------------------------------------------
+   Print
+   --------------------------------------------------------- */
+
+@media print {
+  .sidebar,
+  .topbar,
+  .filters,
+  .page-actions,
+  .pagination,
+  .toasts,
+  .sidebar-toggle {
+    display: none !important;
+  }
+
+  .shell {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .content {
+    overflow: visible;
+    padding: 0;
+  }
+
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
+
+/* Payment plan editor: the plan list moves above the editor. */
+@media (max-width: 1024px) {
+  .plan-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .plan-list {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .stage-row {
+    grid-template-columns: 20px minmax(0, 1fr) 34px;
+    row-gap: 6px;
+  }
+
+  /* The two numeric fields drop under the label on a phone. */
+  .stage-row > :nth-child(3),
+  .stage-row > :nth-child(4) {
+    grid-column: 2;
+  }
+
+  .stage-row.is-header {
+    display: none;
+  }
+}

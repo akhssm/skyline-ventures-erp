@@ -1,0 +1,145 @@
+# Skyline Ventures ERP
+
+Sell&Bill Estate Operations, a MERN real estate CRM and ERP.
+
+Mobile OTP sign-in, role-based menus, live inventory, leads, bookings,
+collections, commissions and reporting, all backed by MongoDB.
+
+---
+
+## Running it locally
+
+Two terminals. The API first, then the web app.
+
+```bash
+# terminal 1
+cd server
+npm install
+cp .env.example .env      # then fill in MONGODB_URI and JWT_SECRET
+npm run seed              # loads the demo workspace
+npm run dev               # http://localhost:9000
+
+# terminal 2
+cd client
+npm install
+npm run dev               # http://localhost:5173
+```
+
+The Vite dev server proxies `/api` to `http://localhost:9000`, so no CORS
+setup or `VITE_API_URL` is needed while developing.
+
+### Signing in
+
+The seed creates 21 staff accounts. Any of these numbers works, and in demo
+mode the OTP is always `123456` and is shown on screen.
+
+| Mobile     | Name           | Role               |
+| ---------- | -------------- | ------------------ |
+| 9700000001 | Venkat Prasad  | Property Owner     |
+| 9700000002 | Srinivas Naidu | CRM Manager        |
+| 9700000011 | Venkat Patel   | CRM Executive      |
+| 9700000017 | Venkat Achary  | Post-Sales Manager |
+| 9700000021 | Saanvi Gupta   | System Operator    |
+
+Each role sees a different sidebar and a different slice of the data.
+
+---
+
+## What the seed creates
+
+| Collection      | Rows  |
+| --------------- | ----- |
+| Users           | 21    |
+| Projects        | 9     |
+| Units           | 2,326 |
+| Leads           | 2,421 |
+| Bookings        | 1,570 |
+| Payment rows    | ~7,800 |
+| Commissions     | 400   |
+| Expenses        | 260   |
+
+Re-running `npm run seed` clears and rebuilds only the Skyline Ventures
+organization, so any other tenant in the same database is left alone.
+Set `SEED_LEADS` to change the lead volume.
+
+---
+
+## Project layout
+
+```
+server/
+  config/       db connection, role definitions
+  models/       24 Mongoose schemas, index.js registers them all
+  middleware/   auth (JWT + tenant pinning), error handling
+  utils/        crudFactory and crudRouter, the shared REST engine
+  controllers/  auth, dashboard, leads, bookings, reports
+  routes/       index.js wires every resource
+  seed/         demo data
+
+client/
+  src/api/        axios client and one entry per REST resource
+  src/context/    auth, theme, toasts
+  src/hooks/      useResource, useAsyncData, useLookups, useDebounced
+  src/config/     navigation.js (role menus), modules.jsx (CRUD screens)
+  src/components/ layout, ui primitives, ResourcePage, ResourceForm
+  src/pages/      the screens with behaviour of their own
+  src/styles/     tokens, base, components, layout, pages, login
+```
+
+### How a module screen is built
+
+Anything that is ordinary CRUD is declared as data in `src/config/modules.jsx`
+and rendered by `ResourcePage`. Adding a module means adding a config entry
+with its columns, filters and form fields, not writing a component.
+
+Screens with real behaviour, Dashboard, Leads, Bookings, Inventory,
+Duplicates, Import, Reports and Configuration, are their own components.
+
+### How the API is built
+
+`utils/crudFactory.js` produces list, read, create, update and delete for any
+model, with pagination, search, filtering, sorting and per-role scoping.
+`routes/index.js` mounts 19 resources this way. Anything needing more, such as
+the booking status transition or the dashboard aggregations, has its own
+controller.
+
+Every query is pinned to the organization on the token, so no request can
+reach another tenant's data. Roles that may only see their own records, such
+as a CRM Executive, are narrowed further by `ownerField`.
+
+---
+
+## Deploying to Vercel
+
+The two halves deploy as two separate Vercel projects.
+
+**API.** Root directory `server`. Add these environment variables:
+
+| Variable      | Value                                                   |
+| ------------- | ------------------------------------------------------- |
+| `MONGODB_URI` | your Atlas connection string                            |
+| `JWT_SECRET`  | a long random string                                     |
+| `CLIENT_URL`  | your deployed web URL, comma separated if more than one |
+| `OTP_MODE`    | `demo`, or `live` once an SMS gateway is connected      |
+
+In Atlas, allow access from anywhere (`0.0.0.0/0`) so Vercel's functions can
+connect. The Mongo connection is cached across invocations, and any
+`*.vercel.app` origin is accepted so preview deployments work.
+
+**Web app.** Root directory `client`. Set `VITE_API_URL` to the API URL plus
+`/api`, for example `https://your-api.vercel.app/api`. `vercel.json` already
+rewrites every path to `index.html` so deep links resolve.
+
+---
+
+## Notes
+
+- OTPs are hashed with bcrypt, expire after 5 minutes, allow 5 attempts and
+  are removed by a TTL index. `OTP_MODE=demo` returns the code in the response
+  so the demo is usable without an SMS gateway; set it to `live` and wire a
+  gateway into `controllers/authController.js` before going to production.
+- Rotate `JWT_SECRET` and the database password before any real deployment.
+  The values currently in `server/.env` were used for local development.
+- Dashboard figures are computed from the database, so they move as the data
+  changes. Collection efficiency compares milestones that fell due inside the
+  selected period against how much of that was collected.

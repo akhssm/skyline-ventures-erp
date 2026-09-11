@@ -1,0 +1,693 @@
+/* =========================================================
+   APP SHELL
+   Sidebar rail, sticky topbar, scrolling content column.
+   ========================================================= */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  /* dvh tracks the real viewport once a mobile browser hides its toolbars;
+     the vh line above it is the fallback for browsers without dvh. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--canvas);
+  transition: grid-template-columns 180ms ease;
+}
+
+.shell.is-collapsed {
+  grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr);
+}
+
+/* ---------------------------------------------------------
+   SIDEBAR
+   --------------------------------------------------------- */
+
+.sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  color: var(--nav-text);
+  background: linear-gradient(180deg, var(--nav-from) 0%, var(--nav-to) 100%);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: var(--topbar-h);
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+
+.sidebar-wordmark {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar-wordmark b {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.sidebar-wordmark span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 1.8px;
+  color: var(--nav-section);
+  white-space: nowrap;
+}
+
+/* ---- Collapse control -------------------------------------------
+   It rides the seam between the sidebar and the content, so it stays
+   in exactly the same place whether the rail is open or closed. That
+   is what makes collapsing reversible.
+   ---------------------------------------------------------------- */
+
+.sidebar-toggle {
+  position: absolute;
+  top: 22px;
+  right: -13px;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
+  transition: background 130ms ease, color 130ms ease, transform 130ms ease;
+}
+
+.sidebar-toggle:hover {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.sidebar-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sidebar-section {
+  padding: 16px 18px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.9px;
+  color: var(--nav-section);
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 10px 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  background-clip: content-box;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 1px;
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--nav-text);
+  text-align: left;
+  white-space: nowrap;
+  transition: background 130ms ease, color 130ms ease;
+}
+
+.nav-item:hover {
+  background: var(--nav-hover-bg);
+  color: var(--nav-text-active);
+  text-decoration: none;
+}
+
+.nav-item.is-active {
+  background: var(--nav-active-bg);
+  color: var(--nav-text-active);
+  font-weight: 600;
+}
+
+/* The white rail marking the active row. */
+.nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #fff;
+}
+
+.nav-item svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke-width: 1.8;
+}
+
+.nav-item .nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-count {
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.nav-chevron {
+  width: 14px !important;
+  height: 14px !important;
+  transition: transform 160ms ease;
+}
+
+.nav-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.nav-submenu {
+  padding: 2px 0 6px;
+}
+
+.nav-subitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 12px 7px 41px;
+  border-radius: var(--r-sm);
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.74);
+  text-align: left;
+  transition: background 130ms ease, color 130ms ease;
+}
+
+.nav-subitem:hover {
+  background: var(--nav-hover-bg);
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-subitem.is-active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-subitem::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+/* ---- Theme switch at the foot of the sidebar ------------------- */
+
+.sidebar-foot {
+  flex-shrink: 0;
+  padding: 12px 16px 18px;
+}
+
+.theme-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.theme-switch button {
+  padding: 6px 0;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.theme-switch button.is-active {
+  background: #fff;
+  color: var(--brand-700);
+}
+
+/* ---- Collapsed rail --------------------------------------------
+   Labels and counters fold away; the icons and the seam toggle stay.
+   ---------------------------------------------------------------- */
+
+.shell.is-collapsed .sidebar-wordmark,
+.shell.is-collapsed .sidebar-section,
+.shell.is-collapsed .nav-label,
+.shell.is-collapsed .nav-count,
+.shell.is-collapsed .nav-chevron,
+.shell.is-collapsed .nav-submenu {
+  display: none;
+}
+
+.shell.is-collapsed .sidebar-head {
+  padding: 0;
+  justify-content: center;
+}
+
+.shell.is-collapsed .sidebar-nav {
+  padding: 8px 10px 14px;
+}
+
+.shell.is-collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.shell.is-collapsed .sidebar-foot {
+  padding: 12px 10px 18px;
+}
+
+/* ---------------------------------------------------------
+   MAIN COLUMN
+   --------------------------------------------------------- */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  flex-shrink: 0;
+  padding: 0 var(--content-pad);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.tenant-chip {
+  padding: 7px 15px;
+  border-radius: var(--r-md);
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+/* The hamburger only exists once the sidebar becomes an overlay. */
+.is-mobile-only {
+  display: none;
+}
+
+.icon-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--r-md);
+  color: var(--text-muted);
+  transition: background 130ms ease, color 130ms ease;
+}
+
+.icon-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-dot {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  border: 2px solid var(--surface);
+  background: var(--danger);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---- Profile menu ---------------------------------------------- */
+
+.profile {
+  position: relative;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px 5px 6px;
+  border-radius: var(--r-md);
+  transition: background 130ms ease;
+}
+
+.profile-trigger:hover {
+  background: var(--surface-hover);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.profile-id {
+  text-align: left;
+  line-height: 1.25;
+}
+
+.profile-id b {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.profile-id span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  min-width: 226px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-menu-head {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 6px;
+}
+
+.profile-menu-head b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text-strong);
+}
+
+.profile-menu-head span {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.profile-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  transition: background 120ms ease;
+}
+
+.profile-menu button:hover {
+  background: var(--surface-hover);
+}
+
+.profile-menu button.is-danger {
+  color: var(--danger);
+}
+
+.profile-menu button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---- Notification panel ---------------------------------------- */
+
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: min(420px, 60vh);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.notif-head b {
+  font-size: 13.5px;
+  color: var(--text-strong);
+}
+
+.notif-head button {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-600);
+}
+
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.notif-item.is-unread {
+  background: var(--brand-50);
+}
+
+:root[data-theme="dark"] .notif-item.is-unread {
+  background: var(--surface-hover);
+}
+
+.notif-item b {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.notif-item p {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.notif-item time {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-subtle);
+}
+
+/* ---------------------------------------------------------
+   CONTENT
+   --------------------------------------------------------- */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--content-pad);
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  color: var(--text-strong);
+}
+
+.page-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.page-summary b {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.page-summary .sep {
+  color: var(--border-strong);
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------
+   SIDEBAR AS AN OVERLAY
+   Below this width the rail would eat too much of the screen,
+   so it becomes a drawer the hamburger opens.
+   --------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .shell,
+  .shell.is-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 80;
+    width: min(var(--sidebar-w), 82vw);
+    transform: translateX(-100%);
+    transition: transform 220ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .sidebar.is-open {
+    transform: none;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Collapsing is a desktop affordance. AppLayout stops applying
+     is-collapsed at this width, so the drawer always shows full labels. */
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .sidebar-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(2, 6, 23, 0.5);
+    animation: fade 160ms ease;
+  }
+
+  .is-mobile-only {
+    display: grid;
+  }
+}
