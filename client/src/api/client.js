@@ -1,14 +1,33 @@
 import axios from "axios";
 
-// In development Vite proxies /api to the local server, so the default base is
-// a relative path. Set VITE_API_URL when the API lives on another origin.
-const baseURL = import.meta.env.VITE_API_URL || "/api";
+/**
+ * In development Vite proxies /api to the local server, so the default base is
+ * a relative path. Set VITE_API_URL when the API lives on another origin.
+ *
+ * The suffix is added here rather than demanded of whoever sets the variable,
+ * because "https://host" and "https://host/api" are both the obvious thing to
+ * paste into a hosting dashboard and only one of them used to work.
+ */
+const resolveBaseUrl = () => {
+    const configured = (import.meta.env.VITE_API_URL || "").trim();
+
+    if (!configured) return "/api";
+
+    const trimmed = configured.replace(/\/+$/, "");
+
+    return /\/api$/.test(trimmed) ? trimmed : `${trimmed}/api`;
+};
+
+const baseURL = resolveBaseUrl();
 
 export const TOKEN_KEY = "sb.token";
 
+/* A free hosting tier stops the API after a spell of no traffic, and the next
+   request pays for the restart. Sixty seconds covers that cold start; a normal
+   response still arrives in well under a second. */
 const api = axios.create({
     baseURL,
-    timeout: 30000,
+    timeout: 60000,
     headers: { "Content-Type": "application/json" },
 });
 
@@ -43,7 +62,7 @@ api.interceptors.response.use(
         const message =
             error.response?.data?.message ||
             (error.code === "ECONNABORTED"
-                ? "The request timed out. Please try again."
+                ? "The server took too long to answer. It may be waking up, so please try again."
                 : error.request && !error.response
                   ? "Cannot reach the server. Check that the API is running."
                   : "Something went wrong. Please try again.");

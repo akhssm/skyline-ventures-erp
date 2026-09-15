@@ -1,0 +1,79 @@
+# Render blueprint: one API web service and one static front end, both free.
+#
+# Deploy with Render Dashboard -> New -> Blueprint, then point it at this repo.
+# The values marked `sync: false` are asked for once during that step and are
+# never written into the repository.
+
+services:
+    # ---------------------------------------------------------
+    # API
+    # Free instances sleep after roughly 15 minutes without a
+    # request; the next call pays for the restart.
+    # ---------------------------------------------------------
+    - type: web
+      name: skyline-erp-api
+      runtime: node
+      plan: free
+      rootDir: server
+      buildCommand: npm install
+      startCommand: npm start
+      healthCheckPath: /api/health
+      autoDeploy: true
+      envVars:
+          - key: NODE_ENV
+            value: production
+          - key: NODE_VERSION
+            value: 20.19.6
+
+          # Atlas connection string. Paste it when the blueprint is created.
+          - key: MONGODB_URI
+            sync: false
+
+          # Render generates this once, so no secret is ever committed.
+          - key: JWT_SECRET
+            generateValue: true
+          - key: JWT_EXPIRES_IN
+            value: 7d
+
+          # Comma separated. Fill in the static site URL after the first
+          # deploy; requests from *.onrender.com are trusted regardless.
+          - key: CLIENT_URL
+            sync: false
+
+          # demo returns the OTP in the response, which is what makes the
+          # published link usable without an SMS gateway.
+          - key: OTP_MODE
+            value: demo
+          - key: DEMO_OTP
+            sync: false
+
+    # ---------------------------------------------------------
+    # FRONT END
+    # A static bundle on Render's CDN. Always on, no cold start.
+    # ---------------------------------------------------------
+    - type: web
+      name: skyline-erp-web
+      runtime: static
+      rootDir: client
+      buildCommand: npm install && npm run build
+      staticPublishPath: dist
+      autoDeploy: true
+      envVars:
+          - key: NODE_VERSION
+            value: 20.19.6
+
+          # The API origin. The client appends /api if it is not already there.
+          - key: VITE_API_URL
+            sync: false
+
+      # Client-side routing: every unknown path is served the shell so a deep
+      # link such as /layout/inventory does not 404 on refresh.
+      routes:
+          - type: rewrite
+            source: /*
+            destination: /index.html
+
+      headers:
+          - path: /assets/*
+            name: Cache-Control
+            value: public, max-age=31536000, immutable
