@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Sell&Bill Estate Operations, a MERN real estate CRM and ERP",
   "scripts": {
-    "install:all": "npm --prefix server install && npm --prefix client install",
+    "install:all": "cd server && npm install && cd ../client && npm install",
     "seed": "npm --prefix server run seed",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
