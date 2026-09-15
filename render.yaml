@@ -1,8 +1,13 @@
 # Render blueprint: one API web service and one static front end, both free.
 #
-# Deploy with Render Dashboard -> New -> Blueprint, then point it at this repo.
-# The values marked `sync: false` are asked for once during that step and are
-# never written into the repository.
+# Live:
+#   https://skyline-erp-web.onrender.com   front end
+#   https://skyline-erp-api.onrender.com   API
+#
+# Those two services already exist, so this file now documents them and is
+# what any rebuild reads. To stand the stack up somewhere new, use Render
+# Dashboard -> New -> Blueprint and point it at this repo; the values marked
+# `sync: false` are asked for during that step and never enter the repository.
 
 services:
     # ---------------------------------------------------------
@@ -14,6 +19,7 @@ services:
       name: skyline-erp-api
       runtime: node
       plan: free
+      region: singapore
       rootDir: server
       buildCommand: npm install
       startCommand: npm start

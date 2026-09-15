@@ -109,6 +109,29 @@ as a CRM Executive, are narrowed further by `ownerField`.
 
 ---
 
+## Live
+
+| | |
+| --- | --- |
+| Front end | https://skyline-erp-web.onrender.com |
+| API | https://skyline-erp-api.onrender.com |
+| Health | https://skyline-erp-api.onrender.com/api/health |
+
+Sign in with any seeded phone number and the code `123456`.
+
+| Role | Phone |
+| --- | --- |
+| Property Owner | `9700000001` |
+| CRM Manager | `9700000002` |
+| CRM Executive | `9700000004` |
+| Channel Partner | `9700000014` |
+
+The API runs on a free instance, so it sleeps after about fifteen minutes
+with no traffic. The first sign-in after a quiet spell waits on that restart
+and can take most of a minute. The front end is static and never sleeps.
+
+---
+
 ## Deploying to Render
 
 Both halves are described by `render.yaml`, so the whole stack comes up from
