@@ -13,6 +13,7 @@ import "./styles/components.css";
 import "./styles/layout.css";
 import "./styles/pages.css";
 import "./styles/login.css";
+import "./styles/manager.css";
 // Last, so its breakpoints override the layers above.
 import "./styles/responsive.css";
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FileText, MessageCircle, Phone, Plus, Trash2, Upload, UserPlus, Users } from "lucide-react";
 
 import { leads as leadsApi, projects as projectsApi, users as usersApi } from "../api/resources";
@@ -76,7 +76,13 @@ const Leads = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearch = useDebounced(searchTerm);
 
-    const [ownership, setOwnership] = useState("all");
+    // A dashboard tile can open this list already narrowed, e.g. ?ownership=unassigned.
+    const [searchParams] = useSearchParams();
+    const [ownership, setOwnership] = useState(() =>
+        ["mine", "unassigned"].includes(searchParams.get("ownership"))
+            ? searchParams.get("ownership")
+            : "all"
+    );
     const [selected, setSelected] = useState(new Set());
     const [editing, setEditing] = useState(null);
     const [isAssigning, setIsAssigning] = useState(false);

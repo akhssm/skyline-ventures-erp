@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Lock } from "lucide-react";
 
 import { useAuth } from "./context/AuthContext";
-import { canAccess, landingPathForRole } from "./config/navigation";
+import { ROLES, canAccess, landingPathForRole } from "./config/navigation";
 import { canOpenConfigPage } from "./config/configurationGroups";
 import AppLayout from "./components/layout/AppLayout";
 import ResourcePage from "./components/ResourcePage";
@@ -11,6 +11,7 @@ import { EmptyState, LoadingState } from "./components/ui";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import ManagerDashboard from "./pages/ManagerDashboard";
 import Leads from "./pages/Leads";
 import Bookings from "./pages/Bookings";
 import BookingsDrilldown from "./pages/BookingsDrilldown";
@@ -124,6 +125,19 @@ const LandingRedirect = () => {
     return <Navigate to={landingPathForRole(user.role)} replace />;
 };
 
+/**
+ * One dashboard route, a different dashboard per role, as the reference
+ * application does. The CRM Manager gets the team and pipeline view; roles
+ * without their own view yet keep the executive overview.
+ */
+const DashboardRoute = () => {
+    const { user } = useAuth();
+
+    if (user.role === ROLES.MARKETING_MANAGER) return <ManagerDashboard />;
+
+    return <Dashboard />;
+};
+
 /** A lazily loaded report screen behind the role guard. */
 const ReportRoute = ({ view }) => (
     <RequireModule moduleId="reports">
@@ -154,7 +168,7 @@ const App = () => (
             >
                 <Route index element={<LandingRedirect />} />
 
-                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="dashboard" element={<DashboardRoute />} />
 
                 {/* The leads screen is addressed as "customers". */}
                 <Route path="customers" element={<Leads />} />

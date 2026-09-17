@@ -92,6 +92,21 @@
   --chart-5: #ec4899;
   --chart-6: #06b6d4;
   --chart-grid: #e8eef6;
+
+  /* ---- Categorical series, one hue per item on team charts ------- */
+  --sb-1: #2a78d6;
+  --sb-2: #eb6834;
+  --sb-3: #1baf7a;
+  --sb-4: #eda100;
+  --sb-5: #e87ba4;
+  --sb-6: #008300;
+  --sb-7: #4a3aa7;
+  --sb-8: #e34948;
+  --sb-other: #9aa6b8;
+  --sb-1-lift: #6da7ec;
+  --sb-3-lift: #57d3a5;
+  --sb-won: #1baf7a;
+  --sb-lost: #e34948;
   --chart-axis: #94a3b8;
 
   /* ---- Sidebar (always the brand gradient, both themes) ---------- */
@@ -203,6 +218,20 @@
   --unit-sold-fg: #93a4c1;
 
   --chart-grid: #1e2c47;
+
+  --sb-1: #4b92e8;
+  --sb-2: #f07a4a;
+  --sb-3: #2cc48d;
+  --sb-4: #f2b12a;
+  --sb-5: #ef8fb3;
+  --sb-6: #3fb83f;
+  --sb-7: #8a7ce0;
+  --sb-8: #f06d6c;
+  --sb-other: #6b7d9c;
+  --sb-1-lift: #8ab9f2;
+  --sb-3-lift: #6ddcb3;
+  --sb-won: #2cc48d;
+  --sb-lost: #f06d6c;
   --chart-axis: #6b7d9c;
 
   --nav-from: #14213d;
