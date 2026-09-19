@@ -184,14 +184,14 @@ const ManagerDashboard = () => {
                             <div className="cap">
                                 Open pipeline weighted by each stage&apos;s win-probability.
                             </div>
-                            <div className="chips">
-                                <span className="chip">
+                            <div className="sb-chips">
+                                <span className="sb-chip">
                                     Quotations <b>{number(data.funnel.quotations)}</b>
                                 </span>
-                                <span className="chip">
+                                <span className="sb-chip">
                                     Booked <b>{number(data.headline.teamBooked)}</b>
                                 </span>
-                                <span className="chip">
+                                <span className="sb-chip">
                                     Visits <b>{number(data.funnel.visits)}</b>
                                 </span>
                             </div>

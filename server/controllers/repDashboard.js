@@ -135,6 +135,7 @@ const repOverview = asyncHandler(async (req, res) => {
         quotationCount,
         visitFacets,
         weekVisits,
+        bookVisits,
         leadTrend,
         buckets,
         pendingFollowUps,
@@ -203,6 +204,8 @@ const repOverview = asyncHandler(async (req, res) => {
             ...inProject,
             scheduledAt: { $gte: weekStart, $lt: weekEnd },
         }),
+
+        SiteVisit.countDocuments({ organization, agent: me, ...inProject }),
 
         Lead.aggregate([
             { $match: { ...mine, createdAt: { $gte: trendStart, $lte: now } } },
@@ -369,7 +372,7 @@ const repOverview = asyncHandler(async (req, res) => {
                 conversions: book.booked,
                 siteVisitsWeek: weekVisits,
                 pendingFollowUps,
-                followUpShare: Math.min(100, ratio(pendingFollowUps, book.open)),
+                followUpShare: Math.min(100, ratio(pendingFollowUps, book.total)),
             },
             quality: {
                 personalConversionRate: ratio(book.booked, book.total),
@@ -378,10 +381,10 @@ const repOverview = asyncHandler(async (req, res) => {
                 followUpOnTime: round1(100 - Math.min(100, ratio(book.overdue, book.open))),
             },
             myFunnel: {
-                leads: totals.leads,
-                visits: visitTotal,
+                leads: book.total,
+                visits: bookVisits,
                 quotations,
-                booked: totals.booked,
+                booked: book.booked,
             },
             // The four counts on my Leads screen: the whole book, not the period.
             health: [

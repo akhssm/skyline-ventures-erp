@@ -153,14 +153,14 @@ const RepDashboard = () => {
                                 {number(data.headline.conversions)} of my{" "}
                                 {number(data.headline.myLeads)} assigned leads have reached Booked.
                             </div>
-                            <div className="chips">
-                                <span className="chip">
+                            <div className="sb-chips">
+                                <span className="sb-chip">
                                     Booked <b>{number(data.headline.conversions)}</b>
                                 </span>
-                                <span className="chip">
+                                <span className="sb-chip">
                                     Visits <b>{number(data.myFunnel.visits)}</b>
                                 </span>
-                                <span className="chip">
+                                <span className="sb-chip">
                                     Visit → booking <b>{pct(data.quality.siteVisitToBooking)}</b>
                                 </span>
                             </div>
@@ -247,7 +247,7 @@ const RepDashboard = () => {
                                 />
                             </div>
                             <div className="cap" style={{ marginTop: 8 }}>
-                                {pct(data.headline.followUpShare)} of my open book
+                                {pct(data.headline.followUpShare)} of my assigned leads
                             </div>
                         </section>
                     </div>

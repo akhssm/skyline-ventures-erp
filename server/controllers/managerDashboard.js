@@ -139,6 +139,9 @@ const managerOverview = asyncHandler(async (req, res) => {
 
     const [
         leadFacets,
+        bookRows,
+        bookVisits,
+        bookQuotations,
         openFacets,
         quotationCount,
         leadTrend,
@@ -194,6 +197,38 @@ const managerOverview = asyncHandler(async (req, res) => {
                 },
             },
         ]),
+
+        /* The headline and the funnel count the team's whole book, not the
+           period, so the tile agrees with the Leads badge in the sidebar.
+           The trends, mixes and per-rep tables below stay period-scoped. */
+        Lead.aggregate([
+            { $match: { organization, ...inProject } },
+            {
+                $group: {
+                    _id: null,
+                    leads: { $sum: 1 },
+                    booked: { $sum: { $cond: [{ $eq: ["$stage", "booked"] }, 1, 0] } },
+                    unassigned: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $in: ["$stage", OPEN_STAGES] },
+                                        { $not: ["$assignedTo"] },
+                                    ],
+                                },
+                                1,
+                                0,
+                            ],
+                        },
+                    },
+                },
+            },
+        ]),
+
+        SiteVisit.countDocuments({ organization, ...inProject }),
+
+        Quotation.countDocuments({ organization, ...inProject }),
 
         Lead.aggregate([
             { $match: openMatch },
@@ -291,6 +326,8 @@ const managerOverview = asyncHandler(async (req, res) => {
 
     const facets = leadFacets[0] || {};
     const totals = facets.totals?.[0] || { leads: 0, booked: 0, unassigned: 0 };
+
+    const book = bookRows[0] || { leads: 0, booked: 0, unassigned: 0 };
 
     const open = openFacets[0] || {};
     const weightedForecast = open.totals?.[0]?.forecast || 0;
@@ -449,11 +486,11 @@ const managerOverview = asyncHandler(async (req, res) => {
     const completedVisits = visitStatus.get(VISIT_LABELS.completed) || 0;
 
     const funnel = {
-        leads: totals.leads,
-        visits: visitTotal,
+        leads: book.leads,
+        visits: bookVisits,
         completedVisits,
-        quotations: quotationCount,
-        booked: totals.booked,
+        quotations: bookQuotations,
+        booked: book.booked,
     };
 
     /* ---- team feed ---- */
@@ -505,11 +542,11 @@ const managerOverview = asyncHandler(async (req, res) => {
             to: now,
             headline: {
                 weightedForecast: Math.round(weightedForecast),
-                teamLeads: totals.leads,
-                teamBooked: totals.booked,
-                teamConversion: ratio(totals.booked, totals.leads),
-                unassignedBacklog: totals.unassigned,
-                backlogShare: Math.min(100, ratio(totals.unassigned, totals.leads)),
+                teamLeads: book.leads,
+                teamBooked: book.booked,
+                teamConversion: ratio(book.booked, book.leads),
+                unassignedBacklog: book.unassigned,
+                backlogShare: Math.min(100, ratio(book.unassigned, book.leads)),
             },
             funnel,
             leadGen,
