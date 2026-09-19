@@ -23,6 +23,8 @@ export const auth = {
 export const dashboard = {
     executive: (params) => api.get("/dashboard/executive", { params }),
     manager: (params) => api.get("/dashboard/manager", { params }),
+    rep: (params) => api.get("/dashboard/rep", { params }),
+    collections: (params) => api.get("/dashboard/collections", { params }),
 };
 
 export const leads = {

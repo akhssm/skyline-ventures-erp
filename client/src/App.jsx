@@ -12,6 +12,8 @@ import { EmptyState, LoadingState } from "./components/ui";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
+import RepDashboard from "./pages/RepDashboard";
+import CollectionsDashboard from "./pages/CollectionsDashboard";
 import Leads from "./pages/Leads";
 import Bookings from "./pages/Bookings";
 import BookingsDrilldown from "./pages/BookingsDrilldown";
@@ -130,12 +132,19 @@ const LandingRedirect = () => {
  * application does. The CRM Manager gets the team and pipeline view; roles
  * without their own view yet keep the executive overview.
  */
+const DASHBOARD_BY_ROLE = {
+    [ROLES.MARKETING_MANAGER]: ManagerDashboard,
+    [ROLES.MARKETING]: RepDashboard,
+    [ROLES.RECEPTIONIST]: RepDashboard,
+    [ROLES.ACCOUNTANT]: CollectionsDashboard,
+};
+
 const DashboardRoute = () => {
     const { user } = useAuth();
 
-    if (user.role === ROLES.MARKETING_MANAGER) return <ManagerDashboard />;
+    const ForRole = DASHBOARD_BY_ROLE[user.role];
 
-    return <Dashboard />;
+    return ForRole ? <ForRole /> : <Dashboard />;
 };
 
 /** A lazily loaded report screen behind the role guard. */
