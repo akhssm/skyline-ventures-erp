@@ -940,3 +940,83 @@
 @media (prefers-reduced-motion: reduce) {
   .sb-gauge .tr i { transition: none; }
 }
+
+/* ---- Tinted headline cards (Post-Sales) -----------------------
+   The finance headline is a row of tinted cards rather than one
+   dominant tile, so five figures read as one set. Matches the
+   reference application's card--blue / rose / sun treatment. */
+
+.sb-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(212px, 1fr));
+}
+
+.sb-grid--auto > .sb-card {
+  grid-column: auto;
+}
+
+.sb-tint-blue {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+}
+
+.sb-tint-rose {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+.sb-tint-sun {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+/* Figures line up column to column, so the finance tiles set them in the
+   monospaced face the reference application uses for the same numbers. */
+.sb-tile .val.is-num {
+  font-family: var(--font-mono);
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.sb-tile .val.is-good { color: var(--success); }
+.sb-tile .val.is-crit { color: var(--danger); }
+
+.sb-tile .val .u {
+  margin-left: 2px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sb-pillbig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+}
+
+.sb-pillbig.is-warn {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+/* The tinted grounds already carry their own contrast, so the sparkline
+   under them uses the accent rather than the pale brand tint. */
+.sb-tint-blue .sb-spark i,
+.sb-tint-rose .sb-spark i,
+.sb-tint-sun .sb-spark i {
+  background: color-mix(in srgb, var(--brand-600) 28%, transparent);
+}
+
+.sb-tint-blue .sb-spark i.is-last,
+.sb-tint-rose .sb-spark i.is-last,
+.sb-tint-sun .sb-spark i.is-last {
+  background: var(--brand-600);
+}

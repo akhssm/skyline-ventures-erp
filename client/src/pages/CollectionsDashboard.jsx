@@ -13,11 +13,13 @@ import { dashboard, projects as projectsApi } from "../api/resources";
 import { useAsyncData } from "../hooks/useResource";
 import { ErrorState, LoadingState } from "../components/ui";
 import {
+    DeltaPill,
     Empty,
     FilterBar,
     Legend,
     Panel,
     Section,
+    Spark,
     Swatch,
     Table,
     axisTick,
@@ -68,6 +70,11 @@ const CollectionsDashboard = () => {
                   }
                 : null,
             agingMax: Math.max(1, ...data.aging.map((row) => row.amount)),
+            // The rate each of the last six months achieved, for the tile's
+            // sparkline. One series, the same rows the chart below plots.
+            efficiencySeries: data.trend.map((row) =>
+                row.due ? Math.round((row.collected / row.due) * 1000) / 10 : 0
+            ),
             commission: [
                 { name: "Earned", value: data.commission.earned, hue: hue(0) },
                 { name: "Due for payout", value: data.commission.dueForPayout, hue: hue(3) },
@@ -105,82 +112,58 @@ const CollectionsDashboard = () => {
                     {/* ---- Collections headline ---- */}
                     <Section title="Collections headline" note="money owed, and how it is arriving" />
 
-                    <div className="sb-grid">
-                        <section className="sb-card sb-tile span3">
-                            <div
-                                className="sb-accent"
-                                style={{ background: "linear-gradient(90deg, var(--warning), var(--danger))" }}
-                            />
+                    <div className="sb-grid sb-grid--auto">
+                        <section className="sb-card sb-tile sb-tint-rose">
                             <div className="lab">Outstanding Dues</div>
-                            <div className="val sb-warn">
+                            <div className="val is-num is-crit">
                                 {compactCurrency(data.headline.outstandingDues)}
                             </div>
                             <div className="cap">overdue &amp; unpaid, past due date</div>
                             <div>
-                                <span className="sb-pill down">
+                                <span className="sb-pillbig">
                                     {number(data.headline.overdueMilestones)} milestones overdue
                                 </span>
                             </div>
                         </section>
 
-                        <section className="sb-card sb-tile sb-hero span3">
+                        <section className="sb-card sb-tile sb-tint-blue">
                             <div className="lab">Collection Efficiency</div>
-                            <div className="val">{pct(data.headline.collectionEfficiency)}</div>
+                            <div className="val is-num is-good">
+                                {data.headline.collectionEfficiency.toFixed(1)}
+                                <span className="u">%</span>
+                            </div>
                             <div className="cap">
                                 {compactCurrency(data.headline.collected)} of{" "}
-                                {compactCurrency(data.headline.amountDue)} due
+                                {compactCurrency(data.headline.amountDue)} <b>due</b>
                             </div>
-                            <div className="sb-meter" style={{ background: "rgba(255,255,255,.22)" }}>
-                                <i
-                                    style={{
-                                        width: `${Math.min(data.headline.collectionEfficiency, 100)}%`,
-                                        background: "#fff",
-                                    }}
-                                />
-                            </div>
-                            <div className="chips">
-                                {view.efficiencyDelta ? (
-                                    <span className="chip">
-                                        {view.efficiencyDelta.text} {vsLabel}
-                                    </span>
-                                ) : null}
-                            </div>
+                            <DeltaPill delta={view.efficiencyDelta} caption={vsLabel} />
+                            <Spark series={view.efficiencySeries} />
                         </section>
 
-                        <section className="sb-card sb-tile span2">
-                            <div
-                                className="sb-accent"
-                                style={{ background: "linear-gradient(90deg, var(--sb-1), var(--sb-1-lift))" }}
-                            />
+                        <section className="sb-card sb-tile sb-tint-blue">
                             <div className="lab">DSO</div>
-                            <div className="val">
+                            <div className="val is-num">
                                 ~{number(data.headline.dsoDays)}
-                                <span className="sb-unit"> days</span>
+                                <span className="u"> days</span>
                             </div>
                             <div className="cap">days sales outstanding</div>
                         </section>
 
-                        <section className="sb-card sb-tile span2">
-                            <div
-                                className="sb-accent"
-                                style={{ background: "linear-gradient(90deg, var(--sb-4), var(--sb-4))" }}
-                            />
-                            <div className="lab">Upcoming · 30d</div>
-                            <div className="val">{compactCurrency(data.headline.upcomingAmount)}</div>
+                        <section className="sb-card sb-tile sb-tint-sun">
+                            <div className="lab">Upcoming Milestones · 30d</div>
+                            <div className="val is-num">
+                                {compactCurrency(data.headline.upcomingAmount)}
+                            </div>
                             <div className="cap">
                                 {number(data.headline.upcomingCount)} milestones due next 30 days
                             </div>
                         </section>
 
-                        <section className="sb-card sb-tile span2">
-                            <div
-                                className="sb-accent"
-                                style={{ background: "linear-gradient(90deg, var(--sb-3), var(--sb-3-lift))" }}
-                            />
+                        <section className="sb-card sb-tile sb-tint-blue">
                             <div className="lab">Last Payment</div>
                             {data.headline.lastPaymentAmount ? (
                                 <>
-                                    <div className="val">
+                                    <div className="val is-num is-good">
                                         {compactCurrency(data.headline.lastPaymentAmount)}
                                     </div>
                                     <div className="cap">
@@ -190,7 +173,7 @@ const CollectionsDashboard = () => {
                                 </>
                             ) : (
                                 <>
-                                    <div className="val">—</div>
+                                    <div className="val is-num">—</div>
                                     <div className="cap">nothing collected in this period</div>
                                 </>
                             )}

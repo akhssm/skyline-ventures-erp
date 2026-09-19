@@ -647,6 +647,17 @@
   flex-wrap: wrap;
 }
 
+/* A select defaults to the full width of its container, which in a header
+   row pushes everything after it onto a second line. Here it sizes to its
+   content instead, so the project picker and the period switch sit together
+   on one line as they do in the reference application. */
+.page-actions .select {
+  width: auto;
+  min-width: 168px;
+  max-width: 220px;
+  flex: 0 0 auto;
+}
+
 /* ---------------------------------------------------------
    SIDEBAR AS AN OVERLAY
    Below this width the rail would eat too much of the screen,

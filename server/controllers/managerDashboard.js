@@ -116,6 +116,11 @@ const managerOverview = asyncHandler(async (req, res) => {
     const inProject = projectId ? { project: projectId } : {};
 
     const leadMatch = { organization, ...inProject, createdAt: { $gte: start, $lte: now } };
+
+    /* Pipeline value is a snapshot, not a slice. "Open pipeline weighted by
+       win-probability" means everything still open today, whenever it came
+       in, so the forecast is not truncated by the period switch. */
+    const openMatch = { organization, ...inProject, stage: { $in: OPEN_STAGES } };
     const visitMatch = { organization, ...inProject, scheduledAt: { $gte: start, $lte: now } };
 
     // Six calendar months ending with this one, for the trend charts.
@@ -134,6 +139,7 @@ const managerOverview = asyncHandler(async (req, res) => {
 
     const [
         leadFacets,
+        openFacets,
         quotationCount,
         leadTrend,
         visitTrend,
@@ -168,15 +174,8 @@ const managerOverview = asyncHandler(async (req, res) => {
                                         ],
                                     },
                                 },
-                                forecast: {
-                                    $sum: { $multiply: [leadValue, probabilityExpr] },
-                                },
                             },
                         },
-                    ],
-                    byStage: [
-                        { $match: { stage: { $in: OPEN_STAGES } } },
-                        { $group: { _id: "$stage", count: { $sum: 1 }, value: { $sum: leadValue } } },
                     ],
                     bySource: [{ $group: { _id: "$source", count: { $sum: 1 } } }],
                     byOutcome: [{ $group: { _id: "$responseStatus", count: { $sum: 1 } } }],
@@ -186,16 +185,38 @@ const managerOverview = asyncHandler(async (req, res) => {
                                 _id: "$assignedTo",
                                 leads: { $sum: 1 },
                                 booked: { $sum: { $cond: [{ $eq: ["$stage", "booked"] }, 1, 0] } },
-                                openLeads: {
-                                    $sum: { $cond: [{ $in: ["$stage", OPEN_STAGES] }, 1, 0] },
-                                },
-                                openValue: {
-                                    $sum: { $cond: [{ $in: ["$stage", OPEN_STAGES] }, leadValue, 0] },
-                                },
-                                forecast: { $sum: { $multiply: [leadValue, probabilityExpr] } },
                                 lost: {
                                     $sum: { $cond: [{ $eq: ["$stage", "lost"] }, leadValue, 0] },
                                 },
+                            },
+                        },
+                    ],
+                },
+            },
+        ]),
+
+        Lead.aggregate([
+            { $match: openMatch },
+            {
+                $facet: {
+                    totals: [
+                        {
+                            $group: {
+                                _id: null,
+                                forecast: { $sum: { $multiply: [leadValue, probabilityExpr] } },
+                            },
+                        },
+                    ],
+                    byStage: [
+                        { $group: { _id: "$stage", count: { $sum: 1 }, value: { $sum: leadValue } } },
+                    ],
+                    byOwner: [
+                        {
+                            $group: {
+                                _id: "$assignedTo",
+                                openLeads: { $sum: 1 },
+                                openValue: { $sum: leadValue },
+                                forecast: { $sum: { $multiply: [leadValue, probabilityExpr] } },
                             },
                         },
                     ],
@@ -269,10 +290,20 @@ const managerOverview = asyncHandler(async (req, res) => {
     ]);
 
     const facets = leadFacets[0] || {};
-    const totals = facets.totals?.[0] || { leads: 0, booked: 0, unassigned: 0, forecast: 0 };
+    const totals = facets.totals?.[0] || { leads: 0, booked: 0, unassigned: 0 };
+
+    const open = openFacets[0] || {};
+    const weightedForecast = open.totals?.[0]?.forecast || 0;
+
+    const openByOwner = new Map(
+        (open.byOwner || []).map((row) => [String(row._id), row])
+    );
 
     const nameOf = new Map(people.map((person) => [String(person._id), person.name]));
     const personName = (id) => (id ? nameOf.get(String(id)) || "Former employee" : "Unassigned");
+
+    // A grouped null id arrives as the string "null".
+    const isUnassigned = (id) => !id || id === "null" || id === "undefined";
 
     /* ---- trends ---- */
 
@@ -339,21 +370,38 @@ const managerOverview = asyncHandler(async (req, res) => {
     /* ---- pipeline ---- */
 
     const pipelineByStage = OPEN_STAGES.map((stage) => {
-        const row = (facets.byStage || []).find((entry) => entry._id === stage);
+        const row = (open.byStage || []).find((entry) => entry._id === stage);
         return { stage: STAGE_LABELS[stage], leads: row?.count || 0, value: row?.value || 0 };
     }).filter((row) => row.leads > 0);
 
-    const owners = (facets.byOwner || []).map((row) => ({
-        rep: personName(row._id),
-        isUnassigned: !row._id,
-        leads: row.leads,
-        booked: row.booked,
-        conversion: ratio(row.booked, row.leads),
-        openLeads: row.openLeads,
-        openValue: row.openValue,
-        forecast: Math.round(row.forecast),
-        lost: row.lost,
-    }));
+    /* Per rep: intake and conversion come from the period, the open book and
+       its forecast from the snapshot, so a rep with no new leads this month
+       still shows the pipeline they are sitting on. */
+    const ownerIds = new Set([
+        ...(facets.byOwner || []).map((row) => String(row._id)),
+        ...openByOwner.keys(),
+    ]);
+
+    const owners = [...ownerIds].map((id) => {
+        const period = (facets.byOwner || []).find((row) => String(row._id) === id) || {
+            leads: 0,
+            booked: 0,
+            lost: 0,
+        };
+        const snapshot = openByOwner.get(id) || { openLeads: 0, openValue: 0, forecast: 0 };
+
+        return {
+            rep: isUnassigned(id) ? "Unassigned" : personName(id),
+            isUnassigned: isUnassigned(id),
+            leads: period.leads,
+            booked: period.booked,
+            conversion: ratio(period.booked, period.leads),
+            openLeads: snapshot.openLeads,
+            openValue: snapshot.openValue,
+            forecast: Math.round(snapshot.forecast),
+            lost: period.lost || 0,
+        };
+    });
 
     const pipelineByOwner = owners
         .filter((row) => row.openLeads > 0)
@@ -456,7 +504,7 @@ const managerOverview = asyncHandler(async (req, res) => {
             from: start,
             to: now,
             headline: {
-                weightedForecast: Math.round(totals.forecast),
+                weightedForecast: Math.round(weightedForecast),
                 teamLeads: totals.leads,
                 teamBooked: totals.booked,
                 teamConversion: ratio(totals.booked, totals.leads),

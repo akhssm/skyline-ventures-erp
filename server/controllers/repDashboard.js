@@ -258,6 +258,7 @@ const repOverview = asyncHandler(async (req, res) => {
                             ],
                         },
                     },
+                    booked: { $sum: { $cond: [{ $eq: ["$stage", "booked"] }, 1, 0] } },
                     hot: { $sum: { $cond: [{ $gte: ["$score", 80] }, 1, 0] } },
                     unqualified: {
                         $sum: { $cond: [{ $eq: ["$stage", "not_qualified"] }, 1, 0] },
@@ -297,7 +298,7 @@ const repOverview = asyncHandler(async (req, res) => {
     const f = facets[0] || {};
     const totals = f.totals?.[0] || { leads: 0, booked: 0, hot: 0, unqualified: 0 };
 
-    const book = bookRows[0] || { total: 0, overdue: 0, hot: 0, unqualified: 0, open: 0 };
+    const book = bookRows[0] || { total: 0, booked: 0, overdue: 0, hot: 0, unqualified: 0, open: 0 };
     const quotations = quotationCount[0]?.count || 0;
 
     const visits = visitFacets[0] || {};
@@ -358,15 +359,20 @@ const repOverview = asyncHandler(async (req, res) => {
             period,
             from: start,
             to: now,
+            /* "My leads · assigned to me" and "my assigned leads have reached
+               Booked" both describe the whole book, which is also what Lead
+               health counts. Scoping them to the period made the same screen
+               report two different totals. The analytical cards below stay
+               period-scoped. */
             headline: {
-                myLeads: totals.leads,
-                conversions: totals.booked,
+                myLeads: book.total,
+                conversions: book.booked,
                 siteVisitsWeek: weekVisits,
                 pendingFollowUps,
                 followUpShare: Math.min(100, ratio(pendingFollowUps, book.open)),
             },
             quality: {
-                personalConversionRate: ratio(totals.booked, totals.leads),
+                personalConversionRate: ratio(book.booked, book.total),
                 siteVisitToBooking: ratio(totals.booked, completedVisits),
                 // The share of my open book whose follow-up has not slipped.
                 followUpOnTime: round1(100 - Math.min(100, ratio(book.overdue, book.open))),
